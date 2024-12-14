@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: aquarela
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+
+  fastzero_app:
+    image: desafio_aquarela
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app 
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/aquarela
+    command: bash -c "poetry run alembic upgrade head && poetry run uvicorn --host 0.0.0.0 desafio_aquarela.app:app --reload"
+
+volumes:
+  pgdata:

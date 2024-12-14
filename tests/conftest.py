@@ -7,17 +7,26 @@ from sqlalchemy import create_engine, event
 from sqlalchemy.orm import Session
 
 from desafio_aquarela.app import app
+from desafio_aquarela.database import get_session
 from desafio_aquarela.models.userModel import table_registry
+from desafio_aquarela.settings import Settings
 
 
 @pytest.fixture
-def client():
-    return TestClient(app)
+def client(session):
+    def get_session_override():
+        return session
+
+    with TestClient(app) as client:
+        app.dependency_overrides[get_session] = get_session_override
+        yield client
+
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture
 def session():
-    engine = create_engine('sqlite:///:memory:')
+    engine = create_engine(Settings().TEST_DATABASE_URL)
     table_registry.metadata.create_all(engine)
 
     with Session(engine) as session:

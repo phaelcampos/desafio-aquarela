@@ -35,8 +35,8 @@ class UserList(BaseModel):
 class UserSchemaUpdate(BaseModel):
     name: Optional[str] = None
     lastName: Optional[str] = None
-    positionCode: Optional[int] = 0
-    leaderCode: Optional[int] = 0
-    statusId: Optional[int] = 0
+    positionCode: Optional[int] = None
+    leaderCode: Optional[int] = None
+    statusId: Optional[int] = None
     password: Optional[str] = None
-    wage: Optional[Decimal] = 0
+    wage: Optional[Decimal] = None

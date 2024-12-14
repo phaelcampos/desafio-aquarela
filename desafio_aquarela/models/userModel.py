@@ -4,8 +4,9 @@ from decimal import Decimal
 from sqlalchemy import func
 from sqlalchemy.orm import Mapped, MappedAsDataclass, mapped_column, registry
 
-table_registry = registry()
 from .base import Base
+
+table_registry = registry()
 
 
 class User(MappedAsDataclass, Base):

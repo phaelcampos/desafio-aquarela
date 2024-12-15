@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 from desafio_aquarela.app import app
 from desafio_aquarela.database import get_session
-from desafio_aquarela.models.userModel import table_registry
+from desafio_aquarela.models.user_model import table_registry
 from desafio_aquarela.settings import Settings
 
 

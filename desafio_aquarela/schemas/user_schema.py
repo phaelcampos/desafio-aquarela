@@ -3,6 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from .leader_schema import LeaderResponse
+
 
 class Message(BaseModel):
     message: str
@@ -22,6 +24,10 @@ class UserSchemaResponse(BaseModel):
     registrationCode: int
     name: str
     lastName: str
+    leader: LeaderResponse
+
+    class Config:
+        from_attributes = True
 
 
 class UserDB(UserSchema):

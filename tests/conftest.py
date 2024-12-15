@@ -66,7 +66,7 @@ def create_user_fixture(
             'lastName': 'Campos',
             'positionCode': create_position_fixture['registrationCode'],
             'leaderCode': create_leader_fixture['registrationCode'],
-            'statusId': 1,
+            'status': 'ativo',
             'password': 'teste123',
             'wage': 3000,
         },

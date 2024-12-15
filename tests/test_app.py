@@ -1,14 +1,14 @@
 from http import HTTPStatus
 
 
-def test_create_user(client):
+def test_create_user(client, create_leader_fixture, create_position_fixture):
     response = client.post(
         '/users',
         json={
             'name': 'Raphael',
             'lastName': 'Campos',
-            'positionCode': 1,
-            'leaderCode': 2,
+            'positionCode': create_position_fixture['registrationCode'],
+            'leaderCode': create_leader_fixture['registrationCode'],
             'statusId': 1,
             'password': 'teste123',
             'wage': 3000,
@@ -49,21 +49,9 @@ def test_read_users(client):
             assert field in user
 
 
-def test_update_user(client):
-    create_response = client.post(
-        '/users',
-        json={
-            'name': 'Raphael',
-            'lastName': 'Campos',
-            'positionCode': 1,
-            'leaderCode': 2,
-            'statusId': 1,
-            'password': 'teste123',
-            'wage': 3000,
-        },
-    )
+def test_update_user(client, create_user_fixture):
     response = client.put(
-        f'/users/{create_response.json()["registrationCode"]}',
+        f'/users/{create_user_fixture["registrationCode"]}',
         json={'name': 'bob', 'lastName': 'ross'},
     )
     required_fields = ['name', 'lastName', 'registrationCode']
@@ -83,21 +71,9 @@ def test_update_user_not_found(client):
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_delete_user(client):
-    create_response = client.post(
-        '/users',
-        json={
-            'name': 'Raphael',
-            'lastName': 'Campos',
-            'positionCode': 1,
-            'leaderCode': 2,
-            'statusId': 1,
-            'password': 'teste123',
-            'wage': 3000,
-        },
-    )
+def test_delete_user(client, create_user_fixture):
     response = client.delete(
-        f'/users/{create_response.json()["registrationCode"]}'
+        f'/users/{create_user_fixture["registrationCode"]}'
     )
 
     assert response.status_code == HTTPStatus.OK

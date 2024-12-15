@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from desafio_aquarela.settings import Settings
 from alembic import context
-from desafio_aquarela.models import Base, User, Leader
+from desafio_aquarela.models import Base, User, Leader, Position
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

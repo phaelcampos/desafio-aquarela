@@ -26,7 +26,7 @@ def client(session):
 
 @pytest.fixture
 def session():
-    engine = create_engine(Settings().TEST_DATABASE_URL)
+    engine = create_engine(Settings().DATABASE_URL)
     table_registry.metadata.create_all(engine)
 
     with Session(engine) as session:
@@ -53,3 +53,47 @@ def _mock_db_time(*, model, time=datetime(2024, 1, 1)):
 @pytest.fixture
 def mock_db_time():
     return _mock_db_time
+
+
+@pytest.fixture
+def create_user_fixture(
+    client, create_leader_fixture, create_position_fixture
+):
+    response = client.post(
+        '/users',
+        json={
+            'name': 'Raphael',
+            'lastName': 'Campos',
+            'positionCode': create_position_fixture['registrationCode'],
+            'leaderCode': create_leader_fixture['registrationCode'],
+            'statusId': 1,
+            'password': 'teste123',
+            'wage': 3000,
+        },
+    )
+    user_data = response.json()
+    return user_data
+
+
+@pytest.fixture
+def create_leader_fixture(client):
+    response = client.post(
+        '/leader',
+        json={
+            'name': 'Lider',
+        },
+    )
+    leader_data = response.json()
+    return leader_data
+
+
+@pytest.fixture
+def create_position_fixture(client):
+    response = client.post(
+        '/position',
+        json={
+            'name': 'Posição',
+        },
+    )
+    position_data = response.json()
+    return position_data

@@ -3,6 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from desafio_aquarela.schemas.position_schema import PositionResponse
+
 from .leader_schema import LeaderResponse
 
 
@@ -25,6 +27,7 @@ class UserSchemaResponse(BaseModel):
     name: str
     lastName: str
     leader: LeaderResponse
+    position: PositionResponse
 
     class Config:
         from_attributes = True

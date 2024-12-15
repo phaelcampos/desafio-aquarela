@@ -6,7 +6,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 from desafio_aquarela.database import get_session
-from desafio_aquarela.models import Leader, User
+from desafio_aquarela.models import User
+from desafio_aquarela.service.validator import EntityValidator
 
 from ..schemas.user_schema import (
     Message,
@@ -24,14 +25,24 @@ router = APIRouter(prefix='/users', tags=['users'])
     status_code=HTTPStatus.CREATED,
     response_model=UserSchemaResponse,
 )
-def create_user(user: UserSchema, session: Session = Depends(get_session)):
-    db_leader = session.scalar(
-        select(Leader).where(Leader.registrationCode == user.leaderCode)
-    )
-    if not db_leader:
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='Leader not found'
-        )
+async def create_user(
+    user: UserSchema, session: Session = Depends(get_session)
+):
+    validator = EntityValidator(session)
+
+    validator = EntityValidator(session)
+    if user.leaderCode is not None:
+        if not await validator.validate_leader(user.leaderCode):
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND, detail='Leader not found'
+            )
+    if user.positionCode is not None:
+        if not await validator.validate_position(user.positionCode):
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND,
+                detail='Position not found',
+            )
+
     db_user = User(
         name=user.name,
         lastName=user.lastName,
@@ -66,14 +77,19 @@ def update_user(
     user: UserSchemaUpdate,
     session: Session = Depends(get_session),
 ):
+    validator = EntityValidator(session)
     if user.leaderCode is not None:
-        db_leader = session.scalar(
-            select(Leader).where(Leader.registrationCode == user.leaderCode)
-        )
-        if not db_leader:
+        if not validator.validate_leader(user.leaderCode):
             raise HTTPException(
-                status_code=HTTPStatus.NOT_FOUND, detail='Leader not found'
+                status_code=HTTPStatus.NOT_FOUND, detail='User not found'
             )
+    if user.positionCode is not None:
+        if not validator.validate_leader(user.positionCode):
+            raise HTTPException(
+                status_code=HTTPStatus.NOT_FOUND,
+                detail='Position not found',
+            )
+
     db_user = session.scalar(
         select(User).where(User.registrationCode == registration_code)
     )

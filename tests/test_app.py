@@ -3,12 +3,12 @@ from http import HTTPStatus
 
 def test_create_user(client):
     response = client.post(
-        '/users/',
+        '/users',
         json={
             'name': 'Raphael',
             'lastName': 'Campos',
             'positionCode': 1,
-            'leaderCode': 1,
+            'leaderCode': 2,
             'statusId': 1,
             'password': 'teste123',
             'wage': 3000,
@@ -16,6 +16,22 @@ def test_create_user(client):
     )
     assert response.status_code == HTTPStatus.CREATED
     assert 'registrationCode' in response.json()
+
+
+def test_create_user_leader_not_found(client):
+    response = client.post(
+        '/users',
+        json={
+            'name': 'Raphael',
+            'lastName': 'Campos',
+            'positionCode': 1,
+            'leaderCode': 0,
+            'statusId': 1,
+            'password': 'teste123',
+            'wage': 3000,
+        },
+    )
+    assert response.status_code == HTTPStatus.NOT_FOUND
 
 
 def test_read_users(client):
@@ -34,8 +50,20 @@ def test_read_users(client):
 
 
 def test_update_user(client):
+    create_response = client.post(
+        '/users',
+        json={
+            'name': 'Raphael',
+            'lastName': 'Campos',
+            'positionCode': 1,
+            'leaderCode': 2,
+            'statusId': 1,
+            'password': 'teste123',
+            'wage': 3000,
+        },
+    )
     response = client.put(
-        '/users/7',
+        f'/users/{create_response.json()["registrationCode"]}',
         json={'name': 'bob', 'lastName': 'ross'},
     )
     required_fields = ['name', 'lastName', 'registrationCode']
@@ -56,7 +84,21 @@ def test_update_user_not_found(client):
 
 
 def test_delete_user(client):
-    response = client.delete('/users/1')
+    create_response = client.post(
+        '/users',
+        json={
+            'name': 'Raphael',
+            'lastName': 'Campos',
+            'positionCode': 1,
+            'leaderCode': 2,
+            'statusId': 1,
+            'password': 'teste123',
+            'wage': 3000,
+        },
+    )
+    response = client.delete(
+        f'/users/{create_response.json()["registrationCode"]}'
+    )
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User deleted'}

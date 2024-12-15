@@ -10,7 +10,7 @@ services:
     ports:
       - "5432:5432"
 
-  fastzero_app:
+  app:
     image: desafio_aquarela
     build: .
     ports:

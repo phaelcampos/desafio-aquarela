@@ -30,7 +30,6 @@ async def create_user(
 ):
     validator = EntityValidator(session)
 
-    validator = EntityValidator(session)
     if user.leaderCode is not None:
         if not await validator.validate_leader(user.leaderCode):
             raise HTTPException(
@@ -48,7 +47,7 @@ async def create_user(
         lastName=user.lastName,
         positionCode=user.positionCode,
         leaderCode=user.leaderCode,
-        statusId=user.statusId,
+        status=user.status,
         password=user.password,
         wage=user.wage,
     )
@@ -72,24 +71,23 @@ def get_user(
 
 
 @router.put('/{registration_code}', response_model=UserSchemaResponse)
-def update_user(
+async def update_user(
     registration_code: int,
     user: UserSchemaUpdate,
     session: Session = Depends(get_session),
 ):
     validator = EntityValidator(session)
     if user.leaderCode is not None:
-        if not validator.validate_leader(user.leaderCode):
+        if not await validator.validate_leader(user.leaderCode):
             raise HTTPException(
-                status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+                status_code=HTTPStatus.NOT_FOUND, detail='Leader not found'
             )
     if user.positionCode is not None:
-        if not validator.validate_leader(user.positionCode):
+        if not await validator.validate_position(user.positionCode):
             raise HTTPException(
                 status_code=HTTPStatus.NOT_FOUND,
                 detail='Position not found',
             )
-
     db_user = session.scalar(
         select(User).where(User.registrationCode == registration_code)
     )

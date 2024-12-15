@@ -1,6 +1,8 @@
 from datetime import datetime
 from decimal import Decimal
+from enum import Enum
 
+from sqlalchemy import Enum as SQLAlchemyEnum
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import (
     Mapped,
@@ -18,6 +20,12 @@ from .base import Base
 table_registry = registry()
 
 
+class UserStatus(str, Enum):
+    ACTIVE = 'ativo'
+    INACTIVE = 'inativo'
+    VACATION = 'ferias'
+
+
 class User(MappedAsDataclass, Base):
     __tablename__ = 'users'
     registrationCode: Mapped[int] = mapped_column(init=False, primary_key=True)
@@ -29,7 +37,14 @@ class User(MappedAsDataclass, Base):
     leaderCode: Mapped[int] = mapped_column(
         ForeignKey('leaders.registrationCode')
     )
-    statusId: Mapped[int]
+    status: Mapped[UserStatus] = mapped_column(
+        SQLAlchemyEnum(
+            UserStatus,
+            name='status_enum',
+            create_constraint=True,
+            native_enum=True,
+        )
+    )
     password: Mapped[str]
     wage: Mapped[Decimal]
     created_at: Mapped[datetime] = mapped_column(
@@ -38,10 +53,10 @@ class User(MappedAsDataclass, Base):
     leader: Mapped['Leader'] = relationship(
         'Leader',
         init=False,
-        lazy='joined',  # para carregar automaticamente
+        lazy='joined',
     )
     position: Mapped['Position'] = relationship(
         'Position',
         init=False,
-        lazy='joined',  # para carregar automaticamente
+        lazy='joined',
     )

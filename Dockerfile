@@ -1,7 +1,6 @@
 FROM python:3.12-slim
 ENV POETRY_VIRTUALENVS_CREATE=false
 
-# Create the app user
 RUN groupadd app && useradd -g app app
 
 WORKDIR /app

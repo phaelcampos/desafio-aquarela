@@ -9,11 +9,13 @@ def test_create_user(client, create_leader_fixture, create_position_fixture):
             'lastName': 'Campos',
             'positionCode': create_position_fixture['registrationCode'],
             'leaderCode': create_leader_fixture['registrationCode'],
-            'statusId': 1,
+            'status': 'ativo',
             'password': 'teste123',
             'wage': 3000,
         },
     )
+    print('Response status:', response.status_code)
+    print('Response body:', response.json())
     assert response.status_code == HTTPStatus.CREATED
     assert 'registrationCode' in response.json()
 
@@ -26,7 +28,23 @@ def test_create_user_leader_not_found(client):
             'lastName': 'Campos',
             'positionCode': 1,
             'leaderCode': 0,
-            'statusId': 1,
+            'status': 'ativo',
+            'password': 'teste123',
+            'wage': 3000,
+        },
+    )
+    assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_create_user_position_not_found(client, create_leader_fixture):
+    response = client.post(
+        '/users',
+        json={
+            'name': 'Raphael',
+            'lastName': 'Campos',
+            'positionCode': 0,
+            'leaderCode': create_leader_fixture['registrationCode'],
+            'status': 'ativo',
             'password': 'teste123',
             'wage': 3000,
         },
@@ -57,6 +75,28 @@ def test_update_user(client, create_user_fixture):
     required_fields = ['name', 'lastName', 'registrationCode']
     for field in required_fields:
         assert field in response.json()
+
+
+def test_update_user_leader_not_found(client, create_user_fixture):
+    response = client.put(
+        f'/users/{create_user_fixture["registrationCode"]}',
+        json={
+            'name': 'bob',
+            'leaderCode': 0,
+        },
+    )
+    assert response.status_code == HTTPStatus.NOT_FOUND
+
+
+def test_update_user_position_not_found(client, create_user_fixture):
+    response = client.put(
+        f'/users/{create_user_fixture["registrationCode"]}',
+        json={
+            'name': 'bob',
+            'positionCode': 0,
+        },
+    )
+    assert response.status_code == HTTPStatus.NOT_FOUND
 
 
 def test_update_user_not_found(client):

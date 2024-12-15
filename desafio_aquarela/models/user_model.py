@@ -11,6 +11,7 @@ from sqlalchemy.orm import (
 )
 
 from desafio_aquarela.models.leaders_model import Leader
+from desafio_aquarela.models.position_model import Position
 
 from .base import Base
 
@@ -22,7 +23,9 @@ class User(MappedAsDataclass, Base):
     registrationCode: Mapped[int] = mapped_column(init=False, primary_key=True)
     name: Mapped[str]
     lastName: Mapped[str]
-    positionCode: Mapped[int]
+    positionCode: Mapped[int] = mapped_column(
+        ForeignKey('position.registrationCode')
+    )
     leaderCode: Mapped[int] = mapped_column(
         ForeignKey('leaders.registrationCode')
     )
@@ -34,6 +37,11 @@ class User(MappedAsDataclass, Base):
     )
     leader: Mapped['Leader'] = relationship(
         'Leader',
+        init=False,
+        lazy='joined',  # para carregar automaticamente
+    )
+    position: Mapped['Position'] = relationship(
+        'Position',
         init=False,
         lazy='joined',  # para carregar automaticamente
     )

@@ -74,6 +74,11 @@ docker compose up -d
 ```bash
 docker compose exec app task test
 ```
+4. to see the cover test:
+```bash
+docker compose exec app task post_test
+```
+5. Open the index file located in the htmlcov folder
 
 ## Potential Enhancements
 - Implement robust logging system

@@ -24,6 +24,15 @@ router = APIRouter(prefix='/position', tags=['positions'])
 def create_position(
     position: PositionSchema, session: Session = Depends(get_session)
 ):
+    """
+    Create a new position.
+
+    Args:
+        position (PositionSchema): The position data to create.
+
+    Returns:
+        PositionResponse: The created position.
+    """
     db_position = Position(
         name=position.name,
     )
@@ -37,6 +46,16 @@ def create_position(
 def get_position(
     skip: int = 0, limit: int = 100, session: Session = Depends(get_session)
 ):
+    """
+    Get all positions.
+
+    Args:
+        skip (int, optional): The number of items to skip. Defaults to 0.
+        limit (int, optional): The number of items to return. Defaults to 100.
+
+    Returns:
+        PositionList: The list of positions.
+    """
     positions = session.scalars(
         select(Position).offset(skip).limit(limit)
     ).all()

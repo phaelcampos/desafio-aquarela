@@ -7,5 +7,9 @@ engine = create_engine(Settings().DATABASE_URL)
 
 
 def get_session():
+    """
+    Yields:
+        sqlalchemy.orm.Session: the database session.
+    """
     with Session(engine) as session:
         yield session

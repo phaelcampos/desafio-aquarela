@@ -28,6 +28,21 @@ router = APIRouter(prefix='/users', tags=['users'])
 async def create_user(
     user: UserSchema, session: Session = Depends(get_session)
 ):
+    """
+    Create a new user in the system.
+
+    Args:
+        user (UserSchema): The information of the user to create.
+        session (Session, optional): The database session dependency.
+
+    Returns:
+        UserSchemaResponse: The created user's information.
+
+    Raises:
+        HTTPException: If the leader or position associated with the user
+        is not found.
+    """
+
     validator = EntityValidator(session)
 
     if user.leaderCode is not None:
@@ -61,6 +76,20 @@ async def create_user(
 def get_user(
     skip: int = 0, limit: int = 100, session: Session = Depends(get_session)
 ):
+    """
+    Return a list of all users.
+
+    Args:
+        skip (int, optional): The number of records to skip. Defaults to 0.
+        limit (int, optional): The number of records to limit the query to.
+        Defaults to 100.
+        session (Session, optional): The database session dependency.
+        Defaults to Depends(get_session).
+
+    Returns:
+        UserList: A dictionary containing the list of users,
+        each represented as a UserSchemaResponse object.
+    """
     users = session.scalars(
         select(User)
         .options(joinedload(User.leader))  # Carrega o leader junto
@@ -76,6 +105,19 @@ async def update_user(
     user: UserSchemaUpdate,
     session: Session = Depends(get_session),
 ):
+    """
+    Update an existing user's information by registration code.
+
+    Args:
+        registration_code (int): The unique code identifying
+        the user to update.
+        user (UserSchemaUpdate): The updated user information.
+        session (Session): The database session dependency.
+
+    Returns:
+        UserSchemaResponse: The updated user information.
+    """
+
     validator = EntityValidator(session)
     if user.leaderCode is not None:
         if not await validator.validate_leader(user.leaderCode):
@@ -111,6 +153,20 @@ async def update_user(
 def delete_user(
     registration_code: int, session: Session = Depends(get_session)
 ):
+    """
+    Delete a user from the system.
+
+    Args:
+        registration_code (int): The registration code of the user to delete.
+        session (Session, optional): The database session dependency.
+
+    Returns:
+        Message: A message indicating that the user was deleted.
+
+    Raises:
+        HTTPException: If the user is not found.
+    """
+
     db_user = session.scalar(
         select(User).where(User.registrationCode == registration_code)
     )

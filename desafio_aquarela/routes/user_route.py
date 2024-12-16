@@ -99,6 +99,34 @@ def get_user(
     return {'users': users}
 
 
+@router.get('/{registration_code}', response_model=UserSchemaResponse)
+def get_user_single_user(
+    registration_code: int, session: Session = Depends(get_session)
+):
+    """
+    Return a user by registration code.
+
+    Args:
+        registration_code (int): The unique code identifying the user
+        to retrieve.
+        session (Session, optional): The database session dependency.
+
+    Returns:
+        UserSchemaResponse: The user information.
+
+    Raises:
+        HTTPException: If the user is not found.
+    """
+    db_user = session.scalar(
+        select(User).where(User.registrationCode == registration_code)
+    )
+    if not db_user:
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+        )
+    return db_user
+
+
 @router.put('/{registration_code}', response_model=UserSchemaResponse)
 async def update_user(
     registration_code: int,

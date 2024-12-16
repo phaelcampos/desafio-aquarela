@@ -87,6 +87,3 @@ docker compose exec app task post_test
 - Implement authentication
 - Add more integration tests
 - Improve existing test suite
-
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

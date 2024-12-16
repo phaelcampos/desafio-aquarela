@@ -21,6 +21,8 @@ services:
       - db
     environment:
       DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/aquarela
+      ALGORITHM: 'HS256'
+      SECRET_KEY: 'supersecretkey'
     command: bash -c "poetry run alembic upgrade head && poetry run uvicorn --host 0.0.0.0 desafio_aquarela.app:app --reload"
 
 volumes:

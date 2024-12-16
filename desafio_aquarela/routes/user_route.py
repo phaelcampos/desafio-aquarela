@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from desafio_aquarela.database import get_session
 from desafio_aquarela.models import User
+from desafio_aquarela.service.auth import get_current_user, get_password_hash
 from desafio_aquarela.service.validator import EntityValidator
 
 from ..schemas.user_schema import (
@@ -48,7 +49,7 @@ async def create_user(
         positionCode=user.positionCode,
         leaderCode=user.leaderCode,
         status=user.status,
-        password=user.password,
+        password=get_password_hash(user.password),
         wage=user.wage,
     )
     session.add(db_user)
@@ -75,7 +76,12 @@ async def update_user(
     registration_code: int,
     user: UserSchemaUpdate,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
 ):
+    if current_user.registrationCode != registration_code:
+        raise HTTPException(
+            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
+        )
     validator = EntityValidator(session)
     if user.leaderCode is not None:
         if not await validator.validate_leader(user.leaderCode):
@@ -101,6 +107,8 @@ async def update_user(
         if value is not None and (
             not isinstance(value, (int, Decimal)) or value != 0
         ):
+            if field == 'password':
+                value = get_password_hash(value)  # noqa
             setattr(db_user, field, value)
     session.commit()
     session.refresh(db_user)
@@ -109,8 +117,15 @@ async def update_user(
 
 @router.delete('/{registration_code}', response_model=Message)
 def delete_user(
-    registration_code: int, session: Session = Depends(get_session)
+    registration_code: int,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+
 ):
+    if current_user.registrationCode != registration_code:
+        raise HTTPException(
+            status_code=HTTPStatus.FORBIDDEN, detail='Not enough permissions'
+        )
     db_user = session.scalar(
         select(User).where(User.registrationCode == registration_code)
     )

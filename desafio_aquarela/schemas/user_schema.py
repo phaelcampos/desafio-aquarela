@@ -4,9 +4,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from desafio_aquarela.schemas.position_schema import PositionResponse
-
 from .leader_schema import LeaderResponse
+from .position_schema import PositionResponse
 
 
 class UserStatus(str, Enum):
